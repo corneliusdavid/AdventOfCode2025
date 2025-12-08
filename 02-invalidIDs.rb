@@ -15,7 +15,10 @@ class InvalidIDs
     if id.length.even?
       half_len = id.length / 2
       if id[0, half_len] == id[half_len, half_len]
+        # has this id already been added?
         return false if @invalid_list.index(id)
+
+        # add this id to the list
         @invalid_list.push(id)
         @invalid_half_total += id.to_i
         @invalid_half_count += 1
@@ -25,11 +28,14 @@ class InvalidIDs
   end
 
   def check_id_allsame(id)
-    first_c = id[0]    
-    for i in 1..(id.length-1)
-      return false if id[i] != first_c
-    end
-    return false if @invalid_list.index(id)
+    # look at each char, exit if they're not all the same
+    first_c = id[0] 
+    id.each_char { |c| return false if c != first_c } 
+
+    # this id has already been added
+    return false if @invalid_list.index(id)           
+
+    # found one with all same digits
     @invalid_list.push(id)
     @invalid_other_count += 1
     @invalid_other_total += id.to_i
@@ -54,7 +60,10 @@ class InvalidIDs
       return false
     end
 
+    # has this id already been added to the list?
     return false if @invalid_list.index(id)
+
+    # add this id to the list
     @invalid_list.push(id)
     @invalid_other_count += 1
     @invalid_other_total += id.to_i
@@ -62,11 +71,13 @@ class InvalidIDs
   end
 
   def check_range(id_range)
+    # split the id range into two numbers
     range = id_range.split('-')
     start = range[0].to_i
     stop  = range[1].to_i
     puts "#{id_range}: [#{start}..#{stop}]" if @logit
 
+    # check all the ids in the range
     for i in start..stop
       check_id_half(i.to_s)
       check_id_other(i.to_s)      
@@ -76,6 +87,7 @@ class InvalidIDs
 end
 
 invalids = InvalidIDs.new
+#data = File.read("input02-sample.txt").split(",")
 data = File.read("input02.txt").split(",")
 invalids.logit = false if data.length > 20
 unless data.empty?
