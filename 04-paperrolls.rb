@@ -25,21 +25,21 @@ class PaperRolls
       nearby_rolls = 0
       if curr_row[i] == '@' || curr_row[i] == 'X'    
         # look left
-        nearby_rolls += 1 if                              i > 0 &&           curr_row[i-1].match(/['@','X']/)
+        nearby_rolls += 1 if                              i > 0 &&           curr_row[i-1].match(/[@X]/)
         # look left/down
-        nearby_rolls += 1 if row_num < (@max_rows - 1) && i > 0 &&           @data[row_num+1][i-1].match(/['@','X']/)
+        nearby_rolls += 1 if row_num < (@max_rows - 1) && i > 0 &&           @data[row_num+1][i-1].match(/[@X]/)
         # look down
-        nearby_rolls += 1 if row_num < (@max_rows - 1) &&                    @data[row_num+1][i].match(/['@','X']/)
+        nearby_rolls += 1 if row_num < (@max_rows - 1) &&                    @data[row_num+1][i].match(/[@X]/)
         # look down/right
-        nearby_rolls += 1 if row_num < (@max_rows - 1) && i < (row_len-1) && @data[row_num+1][i+1].match(/['@','X']/)
+        nearby_rolls += 1 if row_num < (@max_rows - 1) && i < (row_len-1) && @data[row_num+1][i+1].match(/[@X]/)
         # look right
-        nearby_rolls += 1 if                              i < (row_len-1) && curr_row[i+1].match(/['@','X']/)
+        nearby_rolls += 1 if                              i < (row_len-1) && curr_row[i+1].match(/[@X]/)
         # look up/right
-        nearby_rolls += 1 if row_num > 0 &&               i < (row_len-1) && @data[row_num-1][i+1].match(/['@','X']/)
+        nearby_rolls += 1 if row_num > 0 &&               i < (row_len-1) && @data[row_num-1][i+1].match(/[@X]/)
         # look up
-        nearby_rolls += 1 if row_num > 0 &&                                  @data[row_num-1][i].match(/['@','X']/)
+        nearby_rolls += 1 if row_num > 0 &&                                  @data[row_num-1][i].match(/[@X]/)
         # look up/left
-        nearby_rolls += 1 if row_num > 0 &&               i > 0 &&           @data[row_num-1][i-1].match(/['@','X']/)
+        nearby_rolls += 1 if row_num > 0 &&               i > 0 &&           @data[row_num-1][i-1].match(/[@X]/)
 
         if nearby_rolls < 4
           this_row_avail += 1
