@@ -10,46 +10,33 @@ class DialPassword
       @logit = true
     end
 
-  def check_zero_count
-    if @curr_pos == 0
-      @zero_count += 1
-      puts "ZERO FOUND!" if @logit
-    end
-  end
-
-  def rotate_left(amount)
-    @curr_pos += @DIAL_MAX + 1 if @curr_pos == 0
-    @curr_pos -= amount
-    while @curr_pos < 0 do      
-      @zero_passive += 1 if @curr_pos < 0
-      @curr_pos += @DIAL_MAX + 1
-    end
-    puts "rotate left #{amount}: #{@curr_pos} (ZeroCount: #{@zero_count}, ZeroPassive: #{@zero_passive})" if @logit
-    check_zero_count
-  end
-
-  def rotate_right(amount)
+ def rotate(amount)
+    @curr_pos += (@DIAL_MAX + 1) if amount < 0 && @curr_pos == 0  # Special case for left rotation from 0
     @curr_pos += amount
-    while @curr_pos > @DIAL_MAX do      
-      @zero_passive += 1 if @curr_pos > (@DIAL_MAX + 1)
-      @curr_pos -= @DIAL_MAX + 1
+    
+    while @curr_pos < 0 || @curr_pos > @DIAL_MAX
+      if @curr_pos < 0
+        @zero_passive += 1
+        @curr_pos += (@DIAL_MAX + 1)
+      else
+        @zero_passive += 1 if @curr_pos > (@DIAL_MAX + 1)
+        @curr_pos -= (@DIAL_MAX + 1)
+      end
     end
-    puts "rotate right #{amount}: #{@curr_pos} (ZeroCount: #{@zero_count}, ZeroPassive: #{@zero_passive})" if @logit
-    check_zero_count
+    
+    @zero_count += 1 if @curr_pos == 0
+    direction = amount > 0 ? 'right' : 'left'
+    puts "rotate #{direction} #{amount.abs}: #{@curr_pos} (ZeroCount: #{@zero_count}, ZeroPassive: #{@zero_passive})" if @logit
   end
 
 end
 
 dp = DialPassword.new
 data = File.read("input01.txt").split("\n")
-dp.logit = false if data.length > 100
-unless data.empty?
-  data.each do |elem| 
-    if elem[0] == 'L'
-      dp.rotate_left(elem[1,5].to_i)
-    elsif elem[0] == 'R'
-      dp.rotate_right(elem[1,5].to_i)
-    end
-  end
-  puts "Number of zero positions encountered: directly = #{dp.zero_count}, passively = #{dp.zero_passive}; total = #{dp.zero_count + dp.zero_passive}"
+dp.logit = data.length <= 100
+
+data.each do |elem| 
+  amount = elem[1..].to_i
+  dp.rotate(elem[0] == 'L' ? -amount : amount)
 end
+puts "Number of zero positions encountered: directly = #{dp.zero_count}, passively = #{dp.zero_passive}; total = #{dp.zero_count + dp.zero_passive}"

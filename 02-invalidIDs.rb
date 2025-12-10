@@ -11,87 +11,66 @@ class InvalidIDs
     @logit = true
   end
 
+  def add_invalid(id, type)
+    return false if @invalid_list.include?(id)
+    @invalid_list.push(id)
+    val = id.to_i
+    
+    if type == :half
+      @invalid_half_total += val
+      @invalid_half_count += 1
+      puts "  #{id}: half match. invalids (half) found: #{@invalid_half_count}" if @logit
+    else
+      @invalid_other_total += val
+      @invalid_other_count += 1
+      puts "  #{id}: #{type}; #{@invalid_other_count}" if @logit
+    end
+    true
+  end
+
   def check_id_half(id)
+    # flag ids that have two duplicate halfs
     if id.length.even?
       half_len = id.length / 2
-      if id[0, half_len] == id[half_len, half_len]
-        # has this id already been added?
-        return false if @invalid_list.index(id)
-
-        # add this id to the list
-        @invalid_list.push(id)
-        @invalid_half_total += id.to_i
-        @invalid_half_count += 1
-        puts "  #{id}: #{id[0, half_len]}/#{id[half_len, half_len]}. invalids (half) found: #{@invalid_half_count}" if @logit
-      end
+      add_invalid(id, :half) if id[0, half_len] == id[half_len, half_len]
     end
   end
 
   def check_id_allsame(id)
-    # look at each char, exit if they're not all the same
-    first_c = id[0] 
-    id.each_char { |c| return false if c != first_c } 
-
-    # this id has already been added
-    return false if @invalid_list.index(id)           
-
-    # found one with all same digits
-    @invalid_list.push(id)
-    @invalid_other_count += 1
-    @invalid_other_total += id.to_i
-    puts "  #{id}: all same digits; #{@invalid_other_count}" if @logit
+    # flag ids where all digits are the same
+    add_invalid(id, "all same digits") if id.chars.uniq.size == 1
   end 
 
   def check_id_other(id)
-    case id.length
-    when 6
-      # check 3 pairs
-      return false unless id[0,2] == id[2,2] && id[2,2] == id[4,2]
-    when 8
-      # check 4 pairs
-      return false unless id[0,2] == id[2,2] && id[2,2] == id[4,2] && id[4,2] == id[6,2]
-    when 9
-      # check 3 triplets
-      return false unless id[0,3] == id[3,3] && id[3,3] == id[6,3]
-    when 10
-      # check 5 pairs
-      return false unless id[0,2] == id[2,2] && id[2,2] == id[4,2] && id[4,2] == id[6,2] && id[6,2] == id[8,2]
-    else
-      return false
+    # flag ids that have multiple matching chunks
+    patterns = { 6 => 2, 8 => 2, 9 => 3, 10 => 2 }
+    if chunk_size = patterns[id.length]
+      chunks = id.scan(/.{#{chunk_size}}/)
+      add_invalid(id, "other id match") if chunks.uniq.size == 1
     end
+  end
 
-    # has this id already been added to the list?
-    return false if @invalid_list.index(id)
-
-    # add this id to the list
-    @invalid_list.push(id)
-    @invalid_other_count += 1
-    @invalid_other_total += id.to_i
-    puts "  #{id}: other id match; #{@invalid_other_count}" if @logit
+  def check_all_patterns(id)
+    check_id_half(id)
+    check_id_allsame(id)
+    check_id_other(id)
   end
 
   def check_range(id_range)
     # split the id range into two numbers
-    range = id_range.split('-')
-    start = range[0].to_i
-    stop  = range[1].to_i
+    start, stop = id_range.split('-').map(&:to_i)
     puts "#{id_range}: [#{start}..#{stop}]" if @logit
 
     # check all the ids in the range
-    for i in start..stop
-      check_id_half(i.to_s)
-      check_id_other(i.to_s)      
-      check_id_allsame(i.to_s) if i > 99
-    end
+    (start..stop).each { |i| check_all_patterns(i.to_s)}
   end
 end
 
 invalids = InvalidIDs.new
 #data = File.read("input02-sample.txt").split(",")
 data = File.read("input02.txt").split(",")
-invalids.logit = false if data.length > 20
-unless data.empty?
-  data.each { |x| invalids.check_range(x) }
-  puts "the total of the invalid (half) IDs is: #{ invalids.invalid_half_total }."
-  puts "the total of the invalid (all) IDs is: #{ invalids.invalid_other_total + invalids.invalid_half_total }."
-end
+invalids.logit = data.length <= 20
+
+data.each { |x| invalids.check_range(x) }
+puts "the total of the invalid (half) IDs is: #{ invalids.invalid_half_total }."
+puts "the total of the invalid (all) IDs is: #{ invalids.invalid_other_total + invalids.invalid_half_total }."
