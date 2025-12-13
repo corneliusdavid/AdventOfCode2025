@@ -54,7 +54,7 @@ class Batteries
 end
 
 bats = Batteries.new
-#data = File.read("input03-input.txt").split("\n")
+#data = File.read("input03-sample.txt").split("\n")
 data = File.read("input03.txt").split("\n")
 bats.logit = false if data.length > 20
 unless data.empty?
