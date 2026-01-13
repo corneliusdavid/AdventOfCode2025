@@ -57,7 +57,7 @@ class PaperRolls
   def count_all_removable
     rolls_removable = 0
     (0..(@max_rows-1)).select { |x| rolls_removable += count_avail(x)  }
-    puts "#{ rolls_removable } can be removed."
+    puts "#{ rolls_removable } can be removed." if @logit
     return rolls_removable
   end
 

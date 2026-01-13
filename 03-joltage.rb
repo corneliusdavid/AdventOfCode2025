@@ -21,7 +21,7 @@ class Batteries
       end
     end
 
-    puts "bank #{@bank_count} has [02] #{joltage} jolts"
+    puts "bank #{@bank_count} has [02] #{joltage} jolts" if @logit
     @total_joltage += joltage
   end
 
@@ -47,7 +47,7 @@ class Batteries
     end
     
     curr_joltage = stack.join.to_i
-    puts "bank #{@bank_count} has [12] #{curr_joltage} jolts"
+    puts "bank #{@bank_count} has [12] #{curr_joltage} jolts" if @logit
     @total_12joltage += curr_joltage
   end
 
