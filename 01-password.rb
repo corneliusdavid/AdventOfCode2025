@@ -2,13 +2,13 @@ class DialPassword
 
   attr_accessor :zero_count, :zero_passive, :logit
     
-    def initialize
-      @zero_count = 0
-      @zero_passive = 0
-      @curr_pos = 50
-      @DIAL_MAX = 99
-      @logit = true
-    end
+  def initialize
+    @zero_count = 0
+    @zero_passive = 0
+    @curr_pos = 50
+    @DIAL_MAX = 99
+    @logit = true
+  end
 
  def rotate(amount)
     @curr_pos += (@DIAL_MAX + 1) if amount < 0 && @curr_pos == 0  # Special case for left rotation from 0
@@ -33,6 +33,7 @@ end
 
 dp = DialPassword.new
 data = File.read("input01.txt").split("\n")
+# data = File.read("input01-sample.txt").split("\n")
 dp.logit = data.length <= 100
 
 data.each do |elem| 

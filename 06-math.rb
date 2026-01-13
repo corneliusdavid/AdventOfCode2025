@@ -16,8 +16,8 @@ def calc_vert_cols(data, ops)
 	return r.inject(&:+)
 end
 
-fn = "input06-sample.txt"
-#fn = "input06.txt"
+# fn = "input06-sample.txt"
+fn = "input06.txt"
 
 # read the math problems
 input = File.read(fn).split("\n").reject(&:empty?)
